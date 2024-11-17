@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { registerValidator, loginValidator, validate } = require('../validators/authValidator');
-const { register, login } = require('../controllers/authController');
+const { register, login } = require('../controllers/auth.controller');
 
 // Rute untuk registrasi
 router.post('/register', registerValidator, validate, register);
