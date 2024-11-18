@@ -25,9 +25,9 @@ const registerValidator = [
 
 // Validator untuk login
 const loginValidator = [
-  body('username')
-    .notEmpty().withMessage('Username diperlukan.')
-    .isAlphanumeric().withMessage('Username hanya boleh mengandung huruf dan angka.'),
+//   body('username')
+//     .notEmpty().withMessage('Username diperlukan.')
+//     .isAlphanumeric().withMessage('Username hanya boleh mengandung huruf dan angka.'),
 
   body('password')
     .notEmpty().withMessage('Password diperlukan.')

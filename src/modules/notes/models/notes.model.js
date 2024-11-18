@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../../config/database'); // Pastikan Anda sudah mengkonfigurasi koneksi DB
+const sequelize = require('../../../config/database'); // Pastikan Anda sudah mengkonfigurasi koneksi DB
 
 const Note = sequelize.define('Note', {
   title: {
