@@ -1,85 +1,70 @@
-const Note = require('../models/notes.model');
-
-// Membuat catatan baru
-const createNote = async (req, res) => {
-  const { title, content } = req.body;
-  try {
-    const note = await Note.create({
-      title,
-      content,
-      userId: req.user.id, // Menggunakan ID user dari token
-    });
-    res.status(201).json(note);
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong while creating the note.' });
-  }
-};
-
-// Mendapatkan semua catatan pengguna
-const getAllNotes = async (req, res) => {
-  try {
-    const notes = await Note.findAll({
-      where: { userId: req.user.id }, // Filter berdasarkan user yang login
-    });
-    res.status(200).json(notes);
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong while fetching notes.' });
-  }
-};
-
-// Mengambil satu catatan berdasarkan ID
-const getNoteById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const note = await Note.findOne({
-      where: { id, userId: req.user.id }, // Hanya user yang sama yang bisa melihat catatannya
-    });
-    if (!note) {
-      return res.status(404).json({ error: 'Note not found.' });
-    }
-    res.status(200).json(note);
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong while fetching the note.' });
-  }
-};
-
-// Memperbarui catatan
-const updateNote = async (req, res) => {
-  const { id } = req.params;
-  const { title, content } = req.body;
-  try {
-    const note = await Note.findOne({ where: { id, userId: req.user.id } });
-    if (!note) {
-      return res.status(404).json({ error: 'Note not found.' });
-    }
-    note.title = title || note.title;
-    note.content = content || note.content;
-    await note.save();
-    res.status(200).json(note);
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong while updating the note.' });
-  }
-};
-
-// Menghapus catatan
-const deleteNote = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const note = await Note.findOne({ where: { id, userId: req.user.id } });
-    if (!note) {
-      return res.status(404).json({ error: 'Note not found.' });
-    }
-    await note.destroy();
-    res.status(204).json({ message: 'Note deleted successfully.' });
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong while deleting the note.' });
-  }
-};
+const { sendSuccessResponse, sendErrorResponse } = require('../../../utils/response.util');
+const NotesService = require('../services/notes.services');
 
 module.exports = {
-  createNote,
-  getAllNotes,
-  getNoteById,
-  updateNote,
-  deleteNote,
+  // Create a new note
+  createNote: async (req, res) => {
+    try {
+      const { title, content } = req.body;
+      const user_id = req.user.id; // Assuming user ID is stored in req.user after authentication
+
+      const note = await NotesService.createNote(user_id, title, content);
+      sendSuccessResponse(res, note, 'Note created successfully');
+    } catch (error) {
+      sendErrorResponse(res, error, 'Failed to create note');
+    }
+  },
+
+  // Get all notes for the authenticated user
+  getNotes: async (req, res) => {
+    try {
+      const user_id = req.user.id; // Assuming user ID is stored in req.user
+      const notes = await NotesService.getNotesByUserId(user_id);
+      sendSuccessResponse(res, notes, 'Notes fetched successfully');
+    } catch (error) {
+      sendErrorResponse(res, error, 'Failed to fetch notes');
+    }
+  },
+
+  // Get a single note
+  getNotes: async (req, res) => {
+    try {
+      const user_id = req.user.id; // Ambil user_id dari req.user
+      if (!user_id) {
+        return sendErrorResponse(res, null, 'User ID is missing', 400);
+      }
+
+      const notes = await NotesService.getNotesByUserId(user_id);
+      sendSuccessResponse(res, notes, 'Notes fetched successfully');
+    } catch (error) {
+      sendErrorResponse(res, error, 'Failed to fetch notes');
+    }
+  },
+
+  // Update a note
+  updateNote: async (req, res) => {
+    try {
+      const { id: note_id } = req.params;
+      const user_id = req.user.id;
+      const { title, content } = req.body;
+
+      const note = await NotesService.updateNote(note_id, user_id, { title, content });
+      sendSuccessResponse(res, note, 'Note updated successfully');
+    } catch (error) {
+      sendErrorResponse(res, error, 'Failed to update note');
+    }
+  },
+
+  // Delete a note
+  deleteNote: async (req, res) => {
+    try {
+      const { id: note_id } = req.params;
+      const user_id = req.user.id;
+
+      await NotesService.deleteNote(note_id, user_id);
+      sendSuccessResponse(res, null, 'Note deleted successfully');
+    } catch (error) {
+      sendErrorResponse(res, error, 'Failed to delete note');
+    }
+  },
 };

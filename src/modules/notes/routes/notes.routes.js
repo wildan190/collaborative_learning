@@ -1,21 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { createNote, getAllNotes, getNoteById, updateNote, deleteNote } = require('../controllers/notes.controller');
-const { verifyAuth } = require('../../middlewares/authMiddleware'); // Pastikan Anda memiliki middleware verifyAuth
+const NotesController = require('../controllers/notes.controller');
+const { authenticate } = require('../../auth/middleware/auth.middleware');
 
-// Rute untuk membuat catatan
-router.post('/', verifyAuth, createNote);
-
-// Rute untuk mendapatkan semua catatan
-router.get('/', verifyAuth, getAllNotes);
-
-// Rute untuk mendapatkan catatan berdasarkan ID
-router.get('/:id', verifyAuth, getNoteById);
-
-// Rute untuk memperbarui catatan berdasarkan ID
-router.put('/:id', verifyAuth, updateNote);
-
-// Rute untuk menghapus catatan berdasarkan ID
-router.delete('/:id', verifyAuth, deleteNote);
+router.post('/', authenticate, NotesController.createNote);
+router.get('/', authenticate, NotesController.getNotes);
+router.get('/:id', authenticate, NotesController.getNotes);
+router.put('/:id', authenticate, NotesController.updateNote);
+router.delete('/:id', authenticate, NotesController.deleteNote);
 
 module.exports = router;
+
