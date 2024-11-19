@@ -1,35 +1,28 @@
-/**
- * Format untuk respons sukses.
- * @param {Object} res - Objek respons Express.
- * @param {number} code - Status kode HTTP.
- * @param {string} message - Pesan sukses.
- * @param {Object} data - Data tambahan.
- */
-const successResponse = (res, code, message, data = {}) => {
-    res.status(code).json({
-      status: 'success',
-      message,
-      data,
-    });
-  };
+module.exports = {
+    sendSuccessResponse: (res, data, message = 'Success') => {
+      return res.status(200).json({
+        success: true,
+        data: data,
+        message: message
+      });
+    },
   
-  /**
-   * Format untuk respons error.
-   * @param {Object} res - Objek respons Express.
-   * @param {number} code - Status kode HTTP.
-   * @param {string} message - Pesan error.
-   * @param {Object} error - Detail error tambahan.
-   */
-  const errorResponse = (res, code, message, error = {}) => {
-    res.status(code).json({
-      status: 'error',
-      message,
-      error,
-    });
-  };
+    sendErrorResponse: (res, error, message = 'Error') => {
+      // Jika error adalah array (misalnya validasi error)
+      if (Array.isArray(error)) {
+        return res.status(400).json({
+          success: false,
+          errors: error,  // Menampilkan error detail jika ada
+          message: message
+        });
+      }
   
-  module.exports = {
-    successResponse,
-    errorResponse,
+      // Jika error adalah object (misalnya error dari service/database)
+      return res.status(500).json({
+        success: false,
+        error: error.message || error,  // Menampilkan pesan error dari exception
+        message: message
+      });
+    },
   };
   

@@ -1,26 +1,24 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // Pastikan bcryptjs sudah diinstall
 
-/**
- * Hash password.
- * @param {string} password - Password yang akan di-hash.
- * @returns {Promise<string>} Password yang telah di-hash.
- */
+// Fungsi untuk mem-hash password
 const hashPassword = async (password) => {
-  const saltRounds = 10;
-  return await bcrypt.hash(password, saltRounds);
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error('Error hashing password: ' + error.message);
+  }
 };
 
-/**
- * Verifikasi password.
- * @param {string} password - Password asli.
- * @param {string} hash - Hash password yang tersimpan di database.
- * @returns {Promise<boolean>} True jika cocok, false jika tidak.
- */
-const verifyPassword = async (password, hash) => {
-  return await bcrypt.compare(password, hash);
+// Fungsi untuk membandingkan password yang dimasukkan dengan password yang sudah di-hash
+const comparePassword = async (password, hashedPassword) => {
+  try {
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    return isMatch; // Mengembalikan true jika password cocok, false jika tidak
+  } catch (error) {
+    throw new Error('Error comparing passwords: ' + error.message);
+  }
 };
 
-module.exports = {
-  hashPassword,
-  verifyPassword,
-};
+module.exports = { hashPassword, comparePassword };

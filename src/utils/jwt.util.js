@@ -1,28 +1,24 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
-/**
- * Membuat token JWT.
- * @param {Object} payload - Data yang akan dimasukkan ke dalam token.
- * @param {string} secret - Secret key untuk signing token.
- * @param {Object} options - Opsi token (misalnya durasi).
- * @returns {string} Token JWT.
- */
-const createToken = (payload, secret, options = {}) => {
-  return jwt.sign(payload, secret, options);
+// Load environment variables
+dotenv.config();
+
+const generateToken = (userId) => {
+    const payload = { userId }; // Harus menyertakan userId
+    const secret = process.env.JWT_SECRET;
+    const options = { expiresIn: process.env.JWT_EXPIRATION || '1h' };
+  
+    return jwt.sign(payload, secret, options);
+  };
+  
+
+const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
 };
 
-/**
- * Verifikasi token JWT.
- * @param {string} token - Token JWT yang akan diverifikasi.
- * @param {string} secret - Secret key yang digunakan untuk verifikasi.
- * @returns {Object} Payload token jika valid.
- * @throws Error jika token tidak valid atau expired.
- */
-const verifyToken = (token, secret) => {
-  return jwt.verify(token, secret);
-};
-
-module.exports = {
-  createToken,
-  verifyToken,
-};
+module.exports = { generateToken, verifyToken };

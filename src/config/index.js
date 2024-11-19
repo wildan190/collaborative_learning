@@ -1,11 +1,9 @@
-const sequelize = require('./database');  // Koneksi ke database
-const { generateToken, verifyToken } = require('./jwt');  // JWT
-const { verifyAuth, validateRole } = require('./middlewares');  // Middleware umum
+const dotenv = require('dotenv');
+
+// Mengambil environment variables dari file .env
+dotenv.config();
 
 module.exports = {
-  sequelize,
-  generateToken,
-  verifyToken,
-  verifyAuth,
-  validateRole
+  jwtSecret: process.env.JWT_SECRET,
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',  // Default 1 hour
 };

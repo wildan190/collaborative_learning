@@ -1,42 +1,40 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../../../config/database');  // Impor koneksi database
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../../../config/database'); // Import koneksi sequelize
 
 const User = sequelize.define('User', {
   user_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+  },
+  first_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  last_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   username: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: true, // Pastikan username unik
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: true, // Pastikan email unik
+    validate: {
+      isEmail: true,
+    },
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
-  },
-  first_name: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  last_name: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  role: {
-    type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: 'student'  // Peran pengguna: 'admin', 'teacher', 'student'
-  }
+  },
 }, {
-  tableName: 'users',
-  timestamps: true
+  tableName: 'users', // Nama tabel di database
+  timestamps: true,   // Menambahkan created_at dan updated_at secara otomatis
 });
 
 module.exports = User;

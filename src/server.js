@@ -1,44 +1,37 @@
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
 const dotenv = require('dotenv');
-const sequelize = require('./config/database');
 const authRoutes = require('./modules/auth/routes/auth.routes');
-const { globalErrorHandler } = require('./utils/error.util'); // Middleware error handler
+const notesRoutes = require('./modules/notes/routes/notes.routes');
 
+// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 
-// Middleware
+// Middleware untuk menangani JSON body parsing
+app.use(express.json());
+
+// Middleware untuk CORS (Cross-Origin Resource Sharing)
 app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json()); // Parse JSON bodies
 
-// Test database connection
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-    process.exit(1); // Keluar jika koneksi database gagal
-  }
-})();
-
-// Gunakan rute auth
+// Rute untuk otentikasi
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
 
-// Route utama
+// Default route
 app.get('/', (req, res) => {
-  res.send('Welcome to Collaborative Learning Platform API!');
+  res.send('Welcome to Notes App API!');
 });
 
-// Global Error Handler
-app.use(globalErrorHandler);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
 
-// Start server
+// Menjalankan server pada port yang ditentukan di .env atau default 3000
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

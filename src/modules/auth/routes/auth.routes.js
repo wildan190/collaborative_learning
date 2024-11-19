@@ -1,12 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { registerValidator, loginValidator, validate } = require('../validators/authValidator');
-const { register, login } = require('../controllers/auth.controller');
+const AuthController = require('../controllers/auth.controller');
+const { validateRegister, validateLogin } = require('../validators/auth.validators');
 
-// Rute untuk registrasi
-router.post('/register', registerValidator, validate, register);
-
-// Rute untuk login
-router.post('/login', loginValidator, validate, login);
+router.post('/register', validateRegister, AuthController.register);
+router.post('/login', validateLogin, AuthController.login);
 
 module.exports = router;
